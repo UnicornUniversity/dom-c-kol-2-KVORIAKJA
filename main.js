@@ -1,35 +1,121 @@
-//TODO add imports if needed
-//import { exMain } from "./exclude/exampleAss2.js"
-//TODO add/change doc as needed
-/**
- * TODO - Write functional code for this application. You can call any other function, but usage of ".toString(numberSystem)" and "Number.parseInt(number, numberSystem)" is forbidden (only permitted when used on individual digits).
- * The main function which calls the application. 
- * TODO - Please, add specific description here for the application purpose.
- * @param {string} inputNumber number that is being converted
- * @param {number} inputNumberSystem numerical system that the inputNumber is being converted from
- * @param {number} outputNumberSystem numerical system that the inputNumber is being converted into
- * @returns {string} containing number converted to output system
- */
-export function main(inputNumber, inputNumberSystem, outputNumberSystem) {
-  //TODO code
-  //let dtoOut = exMain(inputNumber, inputNumberSystem, outputNumberSystem);
-  return dtoOut;
+//=============== Program na prevod cisla do jednotlivych ciselnych sustav ===============
+
+
+
+//=============== Funkcie ===============
+// Znak na cislo
+function hodnota(znak) {
+  znak = znak.toUpperCase();
+
+  if (znak >= '0' && znak <= '9') return znak.charCodeAt(0) - 48;
+  if (znak >= 'A' && znak <= 'F') return znak.charCodeAt(0) - 55;
+
+  return -1;
 }
 
-/**
- * TODO - Change this to contain all input number systems that your application can convert from.
- * Function which returns which number systems are permitted on input.
- * @returns {Array} array of numbers refering to permitted input systems
- */
-export function permittedInputSystems() {
-	return [10, 2];
+// Preved do desiatkovej
+function doDec(cislo, zaklad) {
+  let vysledok = 0;
+
+  for (let i = 0; i < cislo.length; i++) {
+    let h = hodnota(cislo[i]);
+
+    if (h < 0 || h >= zaklad) {
+      return null;
+    }
+
+    vysledok = vysledok * zaklad + h;
+  }
+
+  return vysledok;
 }
 
-/**
- * TODO - Change this to contain all output number systems that your application can convert to.
- * Function which returns which number systems are permitted on output.
- * @returns {Array} array of numbers refering to permitted output systems
- */
-export function permittedOutputSystems() {
-	return [10, 2];
+// Preved z desiatkovej do inej sustavy
+function zDec(cislo, zaklad) {
+  if (cislo === 0) return "0";
+
+  let vysledok = "";
+
+  while (cislo > 0) {
+    let zvysok = cislo % zaklad;
+
+    if (zvysok < 10) {
+      vysledok = zvysok + vysledok;
+    } else {
+      vysledok = String.fromCharCode(55 + zvysok) + vysledok;
+    }
+
+    cislo = Math.floor(cislo / zaklad);
+  }
+
+  return vysledok;
 }
+
+// Dopln nulu vo vypise
+function doplnNuly(cislo, dlzka) {
+  while (cislo.length < dlzka) {
+    cislo = "0" + cislo;
+  }
+  return cislo;
+}
+
+// =============== Program ===============
+
+// vyber sustavy
+let zaklad;
+
+while (true) {
+  zaklad = prompt("Vyber sustavu z ktorej chces prevadzat (2, 8, 10, 16):");
+
+  if (zaklad === null) {
+    alert("Koniec");
+    throw "koniec";
+  }
+
+  if (zaklad === "2" || zaklad === "8" || zaklad === "10" || zaklad === "16") {
+    zaklad = Number(zaklad);
+    break;
+  }
+
+  alert("Zadaj iba: 2, 8, 10 alebo 16");
+}
+
+// zadanie cisla
+let cislo;
+let dec;
+
+while (true) {
+  cislo = prompt("Zadaj cislo:");
+
+  if (cislo === null) {
+    alert("Koniec");
+    throw "koniec";
+  }
+
+  cislo = cislo.trim();
+
+  if (cislo.length === 0) {
+    alert("Zadaj nejake cislo");
+    continue;
+  }
+
+  dec = doDec(cislo, zaklad);
+
+  if (dec !== null) {
+    break;
+  } else {
+    alert("Neplatne cislo pre zvolenu sustavu");
+  }
+}
+
+// =============== VYSTUP ===============
+
+// Ak binarne s veducou nulou
+let bin = doplnNuly(zDec(dec, 2), 8);
+
+alert(
+  "Binarne: " + bin + "\n" +
+  "Oktalove: " + zDec(dec, 8) + "\n" +
+  "Desiatkove: " + dec + "\n" +
+  "Hexadecimalne: " + zDec(dec, 16)
+);
